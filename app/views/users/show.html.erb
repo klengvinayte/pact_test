@@ -1,0 +1,52 @@
+<h1>User Details</h1>
+
+<p>
+  <strong>Name:</strong>
+  <%= @user.name %>
+</p>
+<p>
+  <strong>Surname:</strong>
+  <%= @user.surname %>
+</p>
+<p>
+  <strong>Patronymic:</strong>
+  <%= @user.patronymic %>
+</p>
+<p>
+  <strong>Fullname:</strong>
+  <%= @user.fullname %>
+</p>
+<p>
+  <strong>Email:</strong>
+  <%= @user.email %>
+</p>
+<p>
+  <strong>Age:</strong>
+  <%= @user.age %>
+</p>
+<p>
+  <strong>Nationality:</strong>
+  <%= @user.nationality %>
+</p>
+<p>
+  <strong>Country:</strong>
+  <%= @user.country %>
+</p>
+<p>
+  <strong>Gender:</strong>
+  <%= @user.gender %>
+</p>
+
+<h2>Interests:</h2>
+<ul>
+  <% @user.interests.each do |interest| %>
+    <li><%= interest.name %></li>
+  <% end %>
+</ul>
+
+<h2>Skills:</h2>
+<ul>
+  <% @user.skills.each do |skill| %>
+    <li><%= skill.name %></li>
+  <% end %>
+</ul>
