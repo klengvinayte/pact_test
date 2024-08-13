@@ -1,24 +1,28 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Requirements
 
-Things you may want to cover:
+- Ruby 3.3.3
+- Rails 7.1.3
+- PostgreSQL
+- Docker and Docker Compose
 
-* Ruby version
+## Getting Started
 
-* System dependencies
+1. Clone the repository
 
-* Configuration
+```bash
+git clone git@github.com:klengvinayte/pact_test.git
+```
 
-* Database creation
 
-* Database initialization
+```bash
+docker-compose up --build
+docker-compose run web rails db:migrate
+```
 
-* How to run the test suite
+## Running the tests
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```bash
+docker-compose run web rspec
+```

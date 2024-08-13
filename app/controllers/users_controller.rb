@@ -17,19 +17,6 @@ class UsersController < ApplicationController
     @user = User.new
   end
 
-  # def create
-  #   result = Users::Create.run(params: user_params.merge(interests: params[:interests] || [],
-  #                                                        skills: params[:skills] || []))
-  #
-  #   if result.valid?
-  #     @user = result.result
-  #     redirect_to @user, notice: 'User was successfully created.'
-  #   else
-  #     flash.now[:alert] = result.errors.full_messages.to_sentence
-  #     render :new, status: :unprocessable_entity
-  #   end
-  # end
-
   def create
     result = Users::Create.run(params: user_params.merge(interests: params[:interests] || [],
                                                          skills: params[:skills] || []))
