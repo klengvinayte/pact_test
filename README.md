@@ -18,6 +18,7 @@ git clone git@github.com:klengvinayte/pact_test.git
 
 ```bash
 docker-compose up --build
+docker-compose run web rails db:create
 docker-compose run web rails db:migrate
 ```
 
@@ -25,4 +26,14 @@ docker-compose run web rails db:migrate
 
 ```bash
 docker-compose run web rspec
+```
+
+## ENV Variables
+You can set the following environment variables in the `.env` file:
+
+```bash
+POSTGRES_USER=
+POSTGRES_PASSWORD=
+POSTGRES_DB=
+DATABASE_HOST=
 ```
