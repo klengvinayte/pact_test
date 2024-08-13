@@ -6,6 +6,10 @@ class User < ApplicationRecord
 
   validates :name, presence: true
   validates :surname, presence: true
+  validates :patronymic, presence: true
+  validates :age, presence: true
+  validates :nationality, presence: true
+  validates :country, presence: true
   validates :gender, presence: true, format: { with: /\A(male|female)\z/ }
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 end
