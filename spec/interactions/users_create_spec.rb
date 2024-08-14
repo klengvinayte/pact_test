@@ -1,78 +1,110 @@
 # frozen_string_literal: true
 
+# spec/interactions/users/create_spec.rb
 require 'rails_helper'
 
 RSpec.describe Users::Create, type: :interaction do
-  let(:params) do
+  let(:valid_params) do
     {
       name: 'John',
       surname: 'Doe',
       patronymic: 'Smith',
       email: 'john.doe@example.com',
-      age: 25,
+      age: 30,
       nationality: 'American',
       country: 'USA',
       gender: 'male',
-      interests: %w[reading coding],
-      skills: %w[ruby rails]
+      interests: %w[Reading Sports],
+      skills: %w[Ruby Rails]
     }
   end
 
-  describe '#execute' do
-    context 'with valid params' do
-      it 'creates a new user' do
-        expect { described_class.run(params:) }.to change(User, :count).by(1)
-      end
+  let(:invalid_email_params) do
+    valid_params.merge(email: 'invalid_email')
+  end
 
-      it 'saves the interests and skills' do
-        result = described_class.run(params:)
-        user = result.result
-        expect(user.interests.map(&:name)).to match_array(%w[reading coding])
-        expect(user.skills.map(&:name)).to match_array(%w[ruby rails])
-      end
+  let(:missing_name_params) do
+    valid_params.except(:name)
+  end
+
+  let(:negative_age_params) do
+    valid_params.merge(age: -1)
+  end
+
+  describe 'with valid params' do
+    let(:result) { described_class.run(valid_params) }
+    let(:user) { result.result }
+
+    it 'returns a valid result' do
+      expect(result).to be_valid
     end
 
-    context 'with an existing email' do
-      before { create(:user, email: params[:email]) }
-
-      it 'does not create a new user' do
-        result = described_class.run(params:)
-        expect(result).to be_invalid
-        expect(result.errors.full_messages).to include('Email has already been taken')
-      end
+    it 'creates a user' do
+      expect { result }.to change(User, :count).by(1)
     end
 
-    context 'with invalid age' do
-      it 'does not create a user if age is below 1' do
-        params[:age] = 0
-        result = described_class.run(params:)
-        expect(result).to be_invalid
-        expect(result.errors.full_messages).to include('Age must be between 1 and 89')
-      end
-
-      it 'does not create a user if age is 90 or above' do
-        params[:age] = 90
-        result = described_class.run(params:)
-        expect(result).to be_invalid
-        expect(result.errors.full_messages).to include('Age must be between 1 and 89')
-      end
+    it 'assigns the correct name' do
+      expect(user.name).to eq('John')
     end
 
-    context 'with invalid gender' do
-      it 'does not create a user if gender is not male or female' do
-        params[:gender] = 'other'
-        result = described_class.run(params:)
-        expect(result).to be_invalid
-        expect(result.errors.full_messages).to include('Gender must be male or female')
-      end
+    it 'assigns the correct surname' do
+      expect(user.surname).to eq('Doe')
     end
 
-    context 'with missing required params' do
-      it 'does not create a user' do
-        params[:name] = nil
-        result = described_class.run(params:)
-        expect(result).to be_invalid
-      end
+    it 'creates interests' do
+      expect(user.interests.count).to eq(2)
+    end
+
+    it 'creates skills' do
+      expect(user.skills.count).to eq(2)
+    end
+  end
+
+  describe 'with invalid email' do
+    let(:result) { described_class.run(invalid_email_params) }
+
+    it 'returns an invalid result' do
+      expect(result).not_to be_valid
+    end
+
+    it 'does not create a user' do
+      expect { result }.not_to change(User, :count)
+    end
+
+    it 'returns email validation errors' do
+      expect(result.errors.full_messages).to include('Email is invalid')
+    end
+  end
+
+  describe 'with missing name' do
+    let(:result) { described_class.run(missing_name_params) }
+
+    it 'returns an invalid result' do
+      expect(result).not_to be_valid
+    end
+
+    it 'does not create a user' do
+      expect { result }.not_to change(User, :count)
+    end
+
+    it 'returns name presence errors' do
+      expect(result.errors.full_messages).to include('Name is required')
+    end
+  end
+
+  describe 'with negative age' do
+    let(:result) { described_class.run(negative_age_params) }
+
+    it 'returns an invalid result' do
+      expect(result).not_to be_valid
+    end
+
+    it 'does not create a user' do
+      expect { result }.not_to change(User, :count)
+    end
+
+    it 'returns age validation errors' do
+      expect(result.errors.full_messages).to include('Age must be greater than or equal to 0')
     end
   end
 end

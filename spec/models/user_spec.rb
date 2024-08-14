@@ -20,26 +20,29 @@ RSpec.describe User, type: :model do
     let(:interests) { %w[Dancing Oceans] }
     let(:skills) { %w[Surfing Cooking] }
 
-    it 'creates a user with associated interests and skills' do
-      # Create a user with interests and skills
-      result = Users::Create.run(params: user_params.merge(interests:, skills:))
-      user = result.result
+    let(:result) { Users::Create.run(user_params.merge(interests:, skills:)) }
+    let(:user) { result.result }
 
-      # Check that the user is created
+    it 'creates a persisted user' do
+      expect(user).not_to be_nil
       expect(user).to be_persisted
+    end
 
-      # Check that the user has the specified interests
+    it 'associates the user with the correct interests' do
       expect(user.interests.pluck(:name)).to match_array(interests)
+    end
 
-      # Check that the user has the specified skills
+    it 'associates the user with the correct skills' do
       expect(user.skills.pluck(:name)).to match_array(skills)
+    end
 
-      # Check that the interests and skills have the user's id
+    it 'associates the interests with the correct user id' do
       user.interests.each do |interest|
         expect(interest.users.pluck(:id)).to include(user.id)
       end
+    end
 
-      # Check that the interests and skills have the user's id
+    it 'associates the skills with the correct user id' do
       user.skills.each do |skill|
         expect(skill.users.pluck(:id)).to include(user.id)
       end

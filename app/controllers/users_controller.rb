@@ -18,22 +18,17 @@ class UsersController < ApplicationController
   end
 
   def create
-    result = Users::Create.run(params: user_params.merge(interests: params[:interests] || [],
-                                                         skills: params[:skills] || []))
+    result = Users::Create.run(
+      user_params.merge(
+        interests: params[:interests] || [],
+        skills: params[:skills] || []
+      )
+    )
 
     if result.valid?
-      @user = result.result
-      if @user
-        redirect_to @user, notice: 'User was successfully created.'
-      else
-        flash[:alert] = 'User creation failed.'
-        render :new, status: :unprocessable_entity, notice: 'User creation failed.'
-      end
+      render json: result.result, status: :created
     else
-      @user = User.new(user_params)
-      Rails.logger.error(result.errors.full_messages.join(', '))
-      flash.now[:alert] = result.errors.full_messages.to_sentence
-      render :new, status: :unprocessable_entity
+      render json: { errors: result.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -46,7 +41,15 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:name, :surname, :patronymic, :email, :age,
-                                 :nationality, :country, :gender)
+    params.require(:user).permit(
+      :name,
+      :surname,
+      :patronymic,
+      :email,
+      :age,
+      :nationality,
+      :country,
+      :gender
+    )
   end
 end
