@@ -52,17 +52,39 @@ module Users
     end
 
     def create_interests(user)
-      interests.each do |interest_name|
-        interest = Interest.find_or_create_by(name: interest_name)
-        user.interests << interest
+      existing_interests = Set.new
+
+      # Using batch processing to load existing interests
+      Interest.find_each(batch_size: 1000) do |interest|
+        existing_interests.add(interest.name)
       end
+
+      new_interests = interests.reject do |interest_name|
+        existing_interests.include?(interest_name)
+      end
+
+      # Mass creation of new interests
+      Interest.insert_all(new_interests.map { |name| { name: } }) if new_interests.any?
+
+      user.interests << Interest.where(name: interests)
     end
 
     def create_skills(user)
-      skills.each do |skill_name|
-        skill = Skill.find_or_create_by(name: skill_name)
-        user.skills << skill
+      existing_skills = Set.new
+
+      # Using batch processing to load existing skills
+      Skill.find_each(batch_size: 1000) do |skill|
+        existing_skills.add(skill.name)
       end
+
+      # Filter out existing skills
+      new_skills = skills.reject { |skill_name| existing_skills.include?(skill_name) }
+
+      # Mass creation of new skills
+      Skill.insert_all(new_skills.map { |name| { name: } }) if new_skills.any?
+
+      # Associate the user with the skills
+      user.skills << Skill.where(name: skills)
     end
 
     def validate_interests

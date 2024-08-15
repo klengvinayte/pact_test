@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_10_093558) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_14_105618) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -18,6 +18,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_10_093558) do
     t.string "name", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_interests_on_name", unique: true
   end
 
   create_table "interests_users", id: false, force: :cascade do |t|
@@ -31,6 +32,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_10_093558) do
     t.string "name", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_skills_on_name", unique: true
   end
 
   create_table "skills_users", id: false, force: :cascade do |t|
