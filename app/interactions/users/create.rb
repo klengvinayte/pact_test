@@ -59,12 +59,14 @@ module Users
         existing_interests.add(interest.name)
       end
 
+      # existing_interests = Interest.where(name: interests).pluck(:name).to_set
+
       new_interests = interests.reject do |interest_name|
         existing_interests.include?(interest_name)
       end
 
       # Mass creation of new interests
-      Interest.insert_all(new_interests.map { |name| { name: } }) if new_interests.any?
+      Interest.create(new_interests.map { |name| { name: } }) if new_interests.any?
 
       user.interests << Interest.where(name: interests)
     end
@@ -77,11 +79,13 @@ module Users
         existing_skills.add(skill.name)
       end
 
+      # existing_skills = Skills.where(name: skills).pluck(:name).to_set
+
       # Filter out existing skills
       new_skills = skills.reject { |skill_name| existing_skills.include?(skill_name) }
 
       # Mass creation of new skills
-      Skill.insert_all(new_skills.map { |name| { name: } }) if new_skills.any?
+      Skill.create(new_skills.map { |name| { name: } }) if new_skills.any?
 
       # Associate the user with the skills
       user.skills << Skill.where(name: skills)

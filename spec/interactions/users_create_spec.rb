@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# spec/interactions/users/create_spec.rb
 require 'rails_helper'
 
 RSpec.describe Users::Create, type: :interaction do
@@ -105,6 +104,58 @@ RSpec.describe Users::Create, type: :interaction do
 
     it 'returns age validation errors' do
       expect(result.errors.full_messages).to include('Age must be greater than or equal to 0')
+    end
+  end
+
+  describe 'with partially existing interests and skills' do
+    before do
+      Interest.create(name: 'Reading')
+      Skill.create(name: 'Ruby')
+    end
+
+    let(:result) { described_class.run(valid_params) }
+    let(:user) { result.result }
+
+    it 'does not create duplicate interests' do
+      expect { result }.to change(Interest, :count).by(1) # Only "Sports" will be created
+    end
+
+    it 'does not create duplicate skills' do
+      expect { result }.to change(Skill, :count).by(1) # Only "Rails" will be created
+    end
+
+    it 'assigns the correct interests to the user' do
+      expect(user.interests.map(&:name)).to match_array(%w[Reading Sports])
+    end
+
+    it 'assigns the correct skills to the user' do
+      expect(user.skills.map(&:name)).to match_array(%w[Ruby Rails])
+    end
+  end
+
+  describe 'with invalid interests type' do
+    let(:invalid_interests_params) { valid_params.merge(interests: ['Reading', 123]) }
+    let(:result) { described_class.run(invalid_interests_params) }
+
+    it 'returns an invalid result' do
+      expect(result).not_to be_valid
+    end
+
+    it 'returns interests validation errors' do
+      expect(result.errors.full_messages).to include('Interests must be an array of strings')
+    end
+  end
+
+  describe 'with invalid skills type' do
+    let(:invalid_skills_params) { valid_params.merge(skills: ['Ruby', 456]) }
+    let(:result) { described_class.run(invalid_skills_params) }
+
+    it 'returns an invalid result' do
+      expect(result).not_to be_valid
+    end
+
+    it 'returns skills validation errors' do
+      expect(result.errors.full_messages).to include('Skills must be an array of strings')
     end
   end
 end
