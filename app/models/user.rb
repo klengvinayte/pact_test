@@ -4,8 +4,11 @@
 # It also contains validations for the user's attributes.
 # It has a many-to-many relationship with skills and interests.
 class User < ApplicationRecord
-  has_and_belongs_to_many :skills
-  has_and_belongs_to_many :interests
+  has_many :interests_users, dependent: :destroy
+  has_many :interests, through: :interests_users
+
+  has_many :skills_users, dependent: :destroy
+  has_many :skills, through: :skills_users
 
   validates :name, presence: true
   validates :surname, presence: true
